@@ -7,8 +7,9 @@ pipeline {
     }
 
     stages {
-      agent { label maven }
+    
       stage('Audit tools') {
+        agent { label maven }
         steps {
           sh '''
        
