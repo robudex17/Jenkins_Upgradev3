@@ -8,16 +8,6 @@ pipeline {
 
     stages {
     
-      stage('Audit tools') {
-        agent { label maven }
-        steps {
-          sh '''
-       
-              mvn -version
-          '''
-        }
-      }
-
       stage('Unit Test') {
         agent { label maven }
         steps {
