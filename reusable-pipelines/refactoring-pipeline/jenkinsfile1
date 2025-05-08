@@ -1,5 +1,5 @@
 pipeline {
-    agent { label maven }
+    agent any
     
     environment {
       VERSION = '0.1.0'
@@ -9,7 +9,7 @@ pipeline {
     stages {
     
       stage('Unit Test') {
-        agent { label maven }
+     
         steps {
           dir('./java-tomcat-sample') {
             sh '''
@@ -21,7 +21,7 @@ pipeline {
       }
 
       stage('Build') {
-        agent { label maven }
+  
         steps {
           echo "Building version: ${VERSION} with suffix: ${RELEASE_VERSION}"
           echo 'Mention your Application Build Code here!!!'
