@@ -1,6 +1,9 @@
 pipeline {
     agent any
-    
+
+    parameters {
+        booleanParam( name: 'RELEASE', defaultValue: false, description: 'Is this a Release Candidate?')
+    }
     environment {
       VERSION = '0.1.0'
       RELEASE_VERSION = 'R.2'
@@ -42,6 +45,19 @@ pipeline {
                     }
             }
         }
+      stage('Publish') {
+         when {
+            expression {return params.RELEASE}
+         }
+         steps {
+             archiveArtifacts('**/*.war')
+         }
+      }
+  }
+  post {
+     always {
+        cleanWs()
+     }
   }
     
 }
