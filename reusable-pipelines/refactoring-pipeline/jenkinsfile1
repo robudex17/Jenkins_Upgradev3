@@ -12,11 +12,7 @@ pipeline {
     stages {
       stage('Audit tools') {
             steps {
-                sh '''
-                  git version
-                  java -version
-                  mvn -version
-                '''
+               auditTools()
             }
         }
       stage('Unit Test') {
@@ -33,17 +29,13 @@ pipeline {
 
       stage('Build') {
         environment {
-            VERSION_SUFFIX = "${sh(script:'if [ "${RELEASE}" = false ] ; then echo -n "${INT_VERSION}"ci:"${BUILD_NUMBER}"; else echo -n "${RELEASE_VERSION}":"${BUILD_NUMBER}"; fi', returnStdout: true)}"
+            VERSION_SUFFIX = getBuildVersion()
         }
         steps {
           echo "Building version: ${INT_VERSION} with suffix: ${VERSION_SUFFIX}"
           echo 'Mention your Application Build Code here!!!'
           dir('./java-tomcat-sample') {
-                        sh '''
-                            mvn versions:set -DnewVersion="${VERSION_SUFFIX}"-SNAPSHOT
-                            mvn versions:update-child-modules
-                            mvn clean package
-                        '''
+                      packageApplication()
                     }
             }
         }
@@ -62,4 +54,28 @@ pipeline {
      }
   }
     
+}
+
+String getBuildVersion() {
+    if (params.RELEASE) {
+        return env.RELEASE_VERSION + ':' + env.BUILD_NUMBER
+    } else {
+        return env.INT_VERSION + '+ci:' + env.BUILD_NUMBER
+    }
+}
+
+void auditTools() {
+    sh '''
+        git version
+        java -version
+        mvn -version
+    '''
+}
+
+void packageApplication() {
+    sh '''
+        mvn versions:set -DnewVersion="${VERSION_SUFFIX}"-SNAPSHOT
+        mvn versions:update-child-modules
+        mvn clean package
+    '''
 }
